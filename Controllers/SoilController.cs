@@ -9,7 +9,7 @@ namespace IOTProject.Controllers
     public class SoilController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private string _pumpStatus = "off";
+        private static string _pumpStatus = "off";
 
         public SoilController(AppDbContext context)
         {
