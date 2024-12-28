@@ -25,8 +25,8 @@ namespace IOTProject.Controllers
             _context.MoistureDatas.Add(data);
             await _context.SaveChangesAsync();
 
-            // تصمیم‌گیری برای وضعیت پمپ
-            _pumpStatus = data.Moisture < 300 ? "on" : "off";
+            //// تصمیم‌گیری برای وضعیت پمپ
+            //_pumpStatus = data.Moisture < 300 ? "on" : "off";
 
             return Created("", new { message = "Moisture level recorded successfully.", pump_status = _pumpStatus });
         }
