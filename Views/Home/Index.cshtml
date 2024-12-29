@@ -35,7 +35,7 @@
     function addData(data) {
         for (var i = 0; i < data.length; i++) {
             dataPoints.push({
-                x: new Date(data[i].x),
+                x: data[i].x,
                 y: data[i].y
             });
         }

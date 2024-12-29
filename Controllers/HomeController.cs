@@ -23,7 +23,7 @@ public class HomeController : Controller
     public ContentResult JSON()
     {
 
-        var dataPoints = _context.MoistureDatas.AsEnumerable().Select((x,i) => new DataPoint(x.Moisture, i)).ToList();
+        var dataPoints = _context.MoistureDatas.AsEnumerable().Select((x,i) => new DataPoint(i, x.Moisture)).ToList();
 
         JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
         return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
