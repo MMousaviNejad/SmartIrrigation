@@ -1,73 +1,91 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+  ViewData["Title"] = "Home Page";
 }
 
-<div class="d-flex flex-column text-center">
-    <div>Moisture Status: <span id="moisture" class="text-bg-danger p-2 rounded-circle">0</span></div>
+<div class="container d-flex justify-content-center align-items-center">
+  <div class="card shadow-lg border-0" id="containerApp">
+    <div class="card-body text-center">
+      <h4 class="card-title">Moisture and Pump Control</h4>
+      <p class="card-text text-muted">Monitor and control the moisture status and pump functionality effortlessly.</p>
 
-    <div class="mt-3">
-        Pump Status: <span id="pumpstatus" class="text-bg-danger p-2 rounded-circle">off</span>
-        <button onclick="setPumpStatus(event)" id="pumpbutton" class="ms-4 btn btn-success">on</button>
+      <!-- Moisture Status -->
+      <div class="d-flex flex-column align-items-center my-4">
+        <div class="d-flex align-items-center gap-3">
+          <span class="fs-5">Moisture Status:</span>
+          <span id="moisture" class="text-bg-danger p-3 rounded-circle fs-4">0</span>
+        </div>
+      </div>
+
+      <!-- Pump Status -->
+      <div class="d-flex flex-column align-items-center mt-4">
+        <div class="d-flex align-items-center gap-3">
+          <span class="fs-5">Pump Status:</span>
+          <span id="pumpstatus" class="text-bg-danger p-3 rounded-circle fs-4">off</span>
+        </div>
+
+        <button onclick="setPumpStatus(event)" id="pumpbutton" class="btn btn-success btn-lg mt-3">
+          Turn On
+        </button>
+      </div>
     </div>
+  </div>
 </div>
+
 <script>
-    window.onload = function () {
-
-    
-
+  window.onload = function () {
     function soilHandle(data) {
-                    $("#moisture").text(data.moisture);
-        $("#pumpstatus").text(data.pump_status);
-        if (data.pump_status == "on"){
-            $("#pumpstatus").removeClass("text-bg-danger").addClass("text-bg-success");
-                                        $("#pumpbutton").text("off");
-                            $("#pumpbutton").removeClass("btn-success").addClass("btn-danger");
-        }else{;
-            $("#pumpstatus").removeClass("text-bg-success").addClass("text-bg-danger");
-                                        $("#pumpbutton").text("on");
-                            $("#pumpbutton").removeClass("btn-danger").addClass("btn-success");
+      $("#moisture").text(data.moisture);
+      $("#pumpstatus").text(data.pump_status);
+      if (data.pump_status == "on") {
+        $("#pumpstatus")
+          .removeClass("text-bg-danger")
+          .addClass("text-bg-success");
+        $("#pumpbutton").text("off");
+        $("#pumpbutton").removeClass("btn-success").addClass("btn-danger");
+      } else {
+        $("#pumpstatus")
+          .removeClass("text-bg-success")
+          .addClass("text-bg-danger");
+        $("#pumpbutton").text("on");
+        $("#pumpbutton").removeClass("btn-danger").addClass("btn-success");
+      }
+    }
+
+    setInterval(() => {
+      $.getJSON("/Soil/soil-status", soilHandle);
+    }, 1000);
+  };
+  function setPumpStatus(e) {
+    if ($(e.target).text() == "on") {
+      fetch("/Soil/pump-status", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          PumpStatus: "on",
+        }),
+      }).then((res) => {
+        if (res.ok) {
+          $(e.target).text("off");
+          $(e.target).removeClass("btn-success").addClass("btn-danger");
         }
-    }
-
-
-    setInterval(()=>{
-        $.getJSON("/Soil/soil-status", soilHandle);
-
-    },1000);
-    }
-function setPumpStatus(e){
-        if ($(e.target).text()=="on"){
-            fetch("/Soil/pump-status",{
-                method: "post",
-                headers:{
-                    "Content-Type" : "application/json"
-                },
-                    body: JSON.stringify({
-                    "PumpStatus": "on"
-                })
-            }).then(res => {
-                if (res.ok){
-                    $(e.target).text("off");
-                    $(e.target).removeClass("btn-success").addClass("btn-danger");
-                }
-            });
-
-        }else{
-            fetch("/Soil/pump-status",{
-                method: "post",
-                headers:{
-                    "Content-Type" : "application/json"
-                },
-                    body: JSON.stringify({
-                    "PumpStatus": "off"
-                })
-            }).then(res => {
-                if (res.ok){
-                    $(e.target).text("on");
-                    $(e.target).removeClass("btn-danger").addClass("btn-success");
-                }
-            });
-
+      });
+    } else {
+      fetch("/Soil/pump-status", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          PumpStatus: "off",
+        }),
+      }).then((res) => {
+        if (res.ok) {
+          $(e.target).text("on");
+          $(e.target).removeClass("btn-danger").addClass("btn-success");
         }
+      });
     }
+  }
 </script>

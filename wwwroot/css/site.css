@@ -1,4 +1,4 @@
-html {
+/* html {
   font-size: 14px;
 }
 
@@ -8,7 +8,11 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
@@ -18,14 +22,95 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+  background: linear-gradient(135deg, #74ebd5, #9face6);
+  min-height: 100vh;
+  margin: 0;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
   text-align: start;
+} */
+
+body {
+  background: linear-gradient(
+    90deg,
+    #00ffd0 -2.07%,
+    rgba(126, 47, 255, 0.8) 100%
+  );
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+}
+
+#containerApp {
+  box-shadow: 0 6px 20px rgba(12, 20, 47, 0.4);
+  transition: all 0.3s ease;
+  background-color: #fff;
+  padding: 55px;
+  border-radius: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#containerApp:hover {
+  box-shadow: 0 12px 30px rgba(12, 20, 47, 0.4);
+  transform: scale(105%);
+}
+
+#moisture {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #71b0f0 !important
+}
+
+#pumpstatus {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  color: #333;
+  text-align: center;
+}
+
+button {
+  padding: 20px 40px;
+  background-color: #31065a;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+#result {
+  min-width: 500px;
+  min-height: 20px;
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+p {
+  color: red;
+  font-size: large;
 }
