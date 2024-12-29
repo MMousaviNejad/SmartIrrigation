@@ -3,7 +3,7 @@
 }
 
 <div class="d-flex flex-column text-center">
-    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <div>Moisture Status: <span id="moisture" class="text-bg-danger p-2 rounded-circle">0</span></div>
 
     <div class="mt-3">
         Pump Status: <span id="pumpstatus" class="text-bg-danger p-2 rounded-circle">off</span>
@@ -13,37 +13,10 @@
 <script>
     window.onload = function () {
 
-    var dataPoints = [];
-
-    var chart = new CanvasJS.Chart("chartContainer", {
-        animationEnabled: true,
-        theme: "light2",
-        title: {
-            text: "Moisture History"
-        },
-        axisY: {
-            title: "Moisture",
-            titleFontSize: 24
-        },
-        data: [{
-            type: "line",
-            yValueFormatString: "###",
-            dataPoints: dataPoints
-        }]
-    });
-
-    function addData(data) {
-        for (var i = 0; i < data.length; i++) {
-            dataPoints.push({
-                x: data[i].x,
-                y: data[i].y
-            });
-        }
-        chart.render();
-
-    }
+    
 
     function soilHandle(data) {
+                    $("#moisture").text(data.moisture);
         $("#pumpstatus").text(data.pump_status);
         if (data.pump_status == "on"){
             $("#pumpstatus").removeClass("text-bg-danger").addClass("text-bg-success");
@@ -56,12 +29,6 @@
         }
     }
 
-        $.getJSON("/Home/JSON", addData);
-
-    setInterval(()=>{
-        $.getJSON("/Home/JSON", addData);
-
-    },5000);
 
     setInterval(()=>{
         $.getJSON("/Soil/soil-status", soilHandle);
