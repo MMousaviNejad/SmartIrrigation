@@ -47,8 +47,12 @@
         $("#pumpstatus").text(data.pump_status);
         if (data.pump_status == "on"){
             $("#pumpstatus").removeClass("text-bg-danger").addClass("text-bg-success");
+                                        $("#pumpbutton").text("off");
+                            $("#pumpbutton").removeClass("btn-success").addClass("btn-danger");
         }else{;
             $("#pumpstatus").removeClass("text-bg-success").addClass("text-bg-danger");
+                                        $("#pumpbutton").text("on");
+                            $("#pumpbutton").removeClass("btn-danger").addClass("btn-success");
         }
     }
 
