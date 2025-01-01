@@ -1,45 +1,49 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 
 // اطلاعات WiFi
 const char* ssid = "Targol";
 const char* password = "Targol@110";
 
-// آدرس سرور
-const String serverUrl = "http://devhelper.ir";
+// آدرس سرور (HTTPS)
+const String serverUrl = "https://devhelper.ir";
 
 // متغیرها
 int soilMoisture = 0;    // مقدار رطوبت دریافتی از Arduino
 String pumpStatus = "off"; // وضعیت فعلی پمپ
 
-WiFiClient wifiClient;
+WiFiClientSecure wifiClient;
 
 void setup() {
-  Serial.begin(115200); // برای ارتباط با Arduino
+  Serial.begin(115200);
   delay(1000);
 
   // اتصال به WiFi
   connectToWiFi();
-}
 
+  // تنظیم اعتبار SSL
+  wifiClient.setInsecure();
+}
+String incomingData = "";
 void loop() {
-  // دریافت داده از Arduino
-  if (Serial.available()) {
-    String data = Serial.readStringUntil('\n');
-    processIncomingData(data);
+while (Serial.available()) {
+    char receivedChar = Serial.read();  // خواندن یک کاراکتر
+    incomingData += receivedChar;       // افزودن کاراکتر به بافر
+
+    // بررسی وجود نشانگر پایانی
+    if (receivedChar == '\n') {
+      processIncomingData(incomingData); // پردازش داده کامل
+      incomingData = "";                 // خالی کردن بافر برای داده‌های بعدی
+    }
   }
 
-  // ارسال داده رطوبت خاک به سرور و دریافت وضعیت پمپ
-  static unsigned long lastUpdate = 0;
-  if (millis() - lastUpdate >= 5000) { // هر 5 ثانیه
-    lastUpdate = millis();
+    delay(500);
     sendSoilMoisture();
     updatePumpStatus();
-  }
 }
 
-// اتصال به WiFi
 void connectToWiFi() {
   Serial.println("Connecting to WiFi...");
   WiFi.begin(ssid, password);
@@ -52,52 +56,53 @@ void connectToWiFi() {
 
 // پردازش داده دریافتی از Arduino
 void processIncomingData(String data) {
-  if (data.startsWith("moisture:")) {
+  data.trim();
+  if (data.startsWith("Moisture:")){
     soilMoisture = data.substring(9).toInt();
     Serial.println("Soil moisture: " + String(soilMoisture));
   }
 }
 
+
 // ارسال مقدار رطوبت خاک به سرور
 void sendSoilMoisture() {
   if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(wifiClient, serverUrl + "/Soil/soil-data");
-    http.addHeader("Content-Type", "application/json");
+    HTTPClient https;
+    https.begin(wifiClient, serverUrl + "/Soil/soil-data");
+    https.addHeader("Content-Type", "application/json");
 
     String jsonPayload = "{\"moisture\": " + String(soilMoisture) + "}";
-    int httpResponseCode = http.POST(jsonPayload);
+    int httpResponseCode = https.POST(jsonPayload);
 
     if (httpResponseCode == 201) {
-      String response = http.getString();
-      Serial.println("Moisture data sent successfully: " + response);
+      String response = https.getString();
+      Serial.println("Moisture data " + String(soilMoisture) + " sent successfully: " + response);
     } else {
       Serial.println("Failed to send moisture data. Error code: " + String(httpResponseCode));
     }
 
-    http.end();
+    https.end();
   } else {
     connectToWiFi(); // در صورت قطع WiFi، اتصال دوباره
   }
 }
 
-// دریافت وضعیت پمپ از سرور و ارسال به Arduino
+// دریافت وضعیت پمپ از سرور
 void updatePumpStatus() {
   if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(wifiClient, serverUrl + "/Soil/soil-status");
+    HTTPClient https;
+    https.begin(wifiClient, serverUrl + "/Soil/soil-status");
 
-    int httpResponseCode = http.GET();
+    int httpResponseCode = https.GET();
     if (httpResponseCode == 200) {
-      String response = http.getString();
+      String response = https.getString();
       StaticJsonDocument<200> doc;
       DeserializationError error = deserializeJson(doc, response);
 
       if (!error) {
         pumpStatus = doc["pump_status"].as<String>();
         Serial.println("Pump status: " + pumpStatus);
-        Serial.println("pump:" + pumpStatus); // ارسال به Arduino
-        delay(500);
+        Serial.println("pump:" + pumpStatus);
       } else {
         Serial.println("JSON Parsing failed!");
       }
@@ -105,7 +110,7 @@ void updatePumpStatus() {
       Serial.println("Failed to get pump status. Error code: " + String(httpResponseCode));
     }
 
-    http.end();
+    https.end();
   } else {
     connectToWiFi(); // در صورت قطع WiFi، اتصال دوباره
   }
